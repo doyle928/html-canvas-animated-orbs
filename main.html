@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            background: #000;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        function randomIntFromInterval(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+
+        const particlesMax = 25;
+        let particles = [];
+
+        for (let i = 0; i < particlesMax; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                r: randomIntFromInterval(1, 5),
+                d: Math.random() * particlesMax,
+                fill: Math.random()
+            })
+        }
+
+        function drawParticle() {
+            ctx.clearRect(0, 0, width, height);;
+            ctx.beginPath();
+            for (let i = 0; i < particlesMax; i++) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${particles[i].fill})`
+                ctx.arc(particles[i].x, particles[i].y, particles[i].r, 0, Math.PI * 2, true);
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.fill();
+                ctx.closePath();
+            }
+            updateParticles();
+        }
+
+        let angle = .55;
+
+        let additionBool = false;
+
+        function updateParticles() {
+            if (angle > .75) {
+                additionBool = true
+
+            } else if (angle <= .55) {
+                additionBool = false;
+            }
+            if (additionBool) {
+                angle -= 0.01;
+            } else {
+                angle += 0.01;
+            }
+            for (let i = 0; i < particlesMax; i++) {
+                particles[i].y += Math.cos(angle + particles[i].d) - 2.5 + particles[i].r / 2;
+                particles[i].x += Math.sin(angle) * 2;
+                if (particles[i].x > width + 5 || particles[i].x < -5 || particles[i].y < 0 || particles[i].y > height +
+                    5) {
+                    if (Math.random() > .5) {
+                        let newY = Math.random() * height;
+                        particles[i] = {
+                            x: 0,
+                            //focus them on starting in bottom right
+                            y: newY >= (height / 2) ? newY : newY + (height / 2),
+                            r: particles[i].r,
+                            d: particles[i].d,
+                            fill: Math.random()
+
+                        };
+                    } else {
+                        particles[i] = {
+                            x: Math.random() * width,
+                            y: height,
+                            r: particles[i].r,
+                            d: particles[i].d,
+                            fill: Math.random()
+
+                        };
+                    }
+                }
+            }
+        }
+
+        setInterval(drawParticle, 35);
+    </script>
+</body>
+
+</html>
